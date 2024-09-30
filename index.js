@@ -60,15 +60,21 @@ client.on(Events.MessageCreate,(message) => {
 // 隨機
 client.on(Events.MessageCreate,(message) => {
     if (message.author.bot) return;
-    const re = /隨機/.test(message);
-    if (re == true) {
-        let arr = message.content.split(" ");
-        if ((arr[0]) !== "隨機") return;
+    const reRandom = /隨機/.test(message);
+    const reDie = /死/.test(message);
+    if (reRandom !== true) return;
+
+    let arr = message.content.split(" ");
+    if ((arr[0]) !== "隨機") return;
+
+    if (reDie == true){
+        message.channel.send(`還沒死透`);
+    } else{
         let p = getRandomInt(1, (arr.length - 1));
         if (arr[p] == undefined) {
             message.channel.send(`你沒放選項`);
         } else {
-            message.channel.send(`⭢ ${arr[p]}`);
+            message.channel.send(`${arr[p]}`);
         }
     }
 })
@@ -100,35 +106,6 @@ client.on(Events.MessageCreate,(message) => {
     }
 })
 
-//
-// function getGachaResult () {
-//     let gachaRawResult = getRandomInt(1, 100)
-//     message.channel.send(gachaRawResult);
-//     let a = 0;
-//     if (gachaRawResult == 100){
-//         a = `SSR`;
-//     } else if ((gachaRawResult > 90)&&((gachaRawResult < 100)) == true){
-//         message.channel.send(gachaRawResult);
-//         a = `SR`;
-//     } else {
-//         message.channel.send("123");
-//         a = `R`;
-//     }
-
-//     return a;
-// }
-
-// client.on(Events.MessageCreate,(message) => {
-//     if (message.content === "抽卡") {
-//     getGachaResult();
-//         // message.channel.send(`${a}`);
-//     // } else if (message.content === "十連"){
-//     //
-//     // }
-// }})
-
-/* --------------------------------------------------------------------------- */
-
 client.on(Events.MessageCreate,(message) => {
     if (message.content === "抽卡") {
     if (message.author.bot) return;
@@ -141,6 +118,31 @@ client.on(Events.MessageCreate,(message) => {
     } else {
         message.channel.send(`R ${gachaResult}`);
     }
+}})
+
+client.on(Events.MessageCreate,(message) => {
+    if (message.content === "十連") {
+    if (message.author.bot) return;
+
+    let gachaArr = [];
+    let Guarantee = 0;
+    for (let i = 1; i <= 10; i++){
+        let gachaResult = getRandomInt(1, 100)
+        
+        if (gachaResult == 100){
+            gachaArr.push(` SSR`);
+        } else if ((gachaResult > 90)&&((gachaResult < 100)) == true){
+            gachaArr.push(` SR`);
+        } else {
+            gachaArr.push(` R`);
+            Guarantee += 1;
+        }
+    }
+    if (Guarantee == 10){
+        gachaArr[9] = ` SR`;
+    }
+    message.channel.send(`${gachaArr} `);
+
 }})
 
 // Log in to Discord with your client's token
