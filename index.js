@@ -107,18 +107,18 @@ client.on(Events.MessageCreate,(message) => {
 })
 
 client.on(Events.MessageCreate,(message) => {
-    if (message.content === "抽卡") {
     if (message.author.bot) return;
-
-    let gachaResult = getRandomInt(1, 100)
-    if (gachaResult == 100){
-        message.channel.send(`SSR`);
-    } else if ((gachaResult > 90)&&((gachaResult < 100)) == true){
-        message.channel.send(`SR`);
-    } else {
-        message.channel.send(`R ${gachaResult}`);
-    }
-}})
+    if (message.content === "單抽"|message.content === "抽卡") {
+        let gachaResult = getRandomInt(1, 100)
+        if (gachaResult == 100){
+            message.channel.send(`SSR`);
+        } else if ((gachaResult > 90)&&((gachaResult < 100)) == true){
+            message.channel.send(`SR`);
+        } else {
+            message.channel.send(`R ${gachaResult}`);
+        }
+    };
+})
 
 client.on(Events.MessageCreate,(message) => {
     if (message.content === "十連") {
@@ -142,7 +142,6 @@ client.on(Events.MessageCreate,(message) => {
         gachaArr[9] = ` SR`;
     }
     message.channel.send(`${gachaArr} `);
-
 }})
 
 // Log in to Discord with your client's token
