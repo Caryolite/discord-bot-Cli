@@ -9,7 +9,7 @@ const client = new Client({
       GatewayIntentBits.GuildMessages,
       GatewayIntentBits.MessageContent,
       GatewayIntentBits.GuildMembers,
-      GatewayIntentBits.GuildVoiceStates, // Add intent for voice state
+    //   GatewayIntentBits.GuildVoiceStates,
     ],
   });
 
@@ -111,11 +111,11 @@ client.on(Events.MessageCreate,(message) => {
     if (message.content === "單抽"|message.content === "抽卡") {
         let gachaResult = getRandomInt(1, 100)
         if (gachaResult == 100){
-            message.channel.send(`SSR`);
+            message.reply(`SSR`);
         } else if ((gachaResult > 90)&&((gachaResult < 100)) == true){
-            message.channel.send(`SR`);
+            message.reply(`SR`);
         } else {
-            message.channel.send(`R ${gachaResult}`);
+            message.reply(`R ${gachaResult}`);
         }
     };
 })
@@ -141,8 +141,51 @@ client.on(Events.MessageCreate,(message) => {
     if (Guarantee == 10){
         gachaArr[9] = ` SR`;
     }
-    message.channel.send(`${gachaArr} `);
+    message.reply(`${gachaArr} `);
 }})
 
-// Log in to Discord with your client's token
+var hp = 1;
+client.on(Events.MessageCreate,(message) => {
+    if (message.author.bot) return;
+    function calcHp (){
+        if (hp <= 0){
+            message.channel.send(`昇天`);
+            hp = 1;
+        } else {
+            message.channel.send(`${hp}`);
+        }
+    }
+    const reATK = /[+-]\d+/g.test(message);
+    if (reATK !== true) return;
+    const atk = parseInt(message);
+    hp = hp + atk;
+    calcHp();
+})
+
+/* ------------------------------------------------------------------------- */
+// 用來記錄哪些用戶已經輸入了 'a'
+const userHasSentA = new Set();
+
+client.on('messageCreate', message => {
+    if (message.author.bot) return;
+
+    // 當用戶輸入 'a' 時
+    if (message.content === 'a') {
+        userHasSentA.add(message.author.id);  // 記錄用戶已經輸入了 'a'
+        message.reply('You have triggered part A. Now, send B.');
+    }
+    
+    // 當用戶輸入 'b' 時，檢查是否已經輸入過 'a'
+    else if (message.content === 'b') {
+        if (userHasSentA.has(message.author.id)) {
+            message.reply('You have now triggered part B! Here is the response C.');
+            userHasSentA.delete(message.author.id);  // 完成後重置狀態
+        } else {
+            message.reply('You need to send A first.');
+        }
+    }
+});
+
+/* ------------------------------------------------------------------------- */
+
 client.login(token);
