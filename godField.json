@@ -1,0 +1,83 @@
+{
+    "weapons":[
+        {
+            "name": "巧克力棒",
+            "effect": "+1",
+            "description": "攻1"
+        },
+        {
+            "name": "鞭子",
+            "effect": "+2",
+            "description": "攻2"
+        },
+        {
+            "name": "拳擊",
+            "effect": "+3",
+            "description": "攻3"
+        },
+        {
+            "name": "斧頭",
+            "effect": "+4",
+            "description": "攻4"
+        },
+        {
+            "name": "鎖鏈鐮刀",
+            "effect": "+5",
+            "description": "攻5"
+        }
+    ],
+    "armor": [
+        {
+            "name": "皮帽",
+            "effect": "-1",
+            "description": "守1"
+        },
+        {
+            "name": "皮衣",
+            "effect": "-2",
+            "description": "守2"
+        },
+        {
+            "name": "鐵護手",
+            "effect": "-3",
+            "description": "守3"
+        },
+        {
+            "name": "鐵之盾",
+            "effect": "-4",
+            "description": "守4"
+        },
+        {
+            "name": "鐵之鎧甲",
+            "effect": "-5",
+            "description": "守5"
+        }
+    ],
+    "sundries": [
+        {
+            "name": "葉子上的露珠",
+            "effect": "hp3",
+            "description": "HP+3"
+        },
+        {
+            "name": "黎明露珠",
+            "effect": "hp4",
+            "description": "HP+4"
+        },
+        {
+            "name": "微笑露珠",
+            "effect": "hp5",
+            "description": "HP+5"
+        },
+        {
+            "name": "心之露珠",
+            "effect": "hp10",
+            "description": "HP+10"
+        },
+        {
+            "name": "浪漫水",
+            "effect": "hp15",
+            "description": "HP+15"
+        }
+    ]
+}

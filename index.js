@@ -39,12 +39,6 @@ client.on(Events.MessageCreate,(message) => {
     } 
 })
 
-client.on(Events.MessageDelete,(message) => {
-    if (message.author.bot) return;
-    message.channel.send(`猴偷山訊息`);
-}
-)
-
 client.on(Events.MessageCreate,(message) => {
     if (message.content === "克里在嗎") {
         let p = getRandomInt(1,2);
@@ -110,12 +104,12 @@ client.on(Events.MessageCreate,(message) => {
     if (message.author.bot) return;
     if (message.content === "單抽"|message.content === "抽卡") {
         let gachaResult = getRandomInt(1, 100)
-        if (gachaResult == 100){
+        if (gachaResult > 98){
             message.reply(`SSR`);
-        } else if ((gachaResult > 90)&&((gachaResult < 100)) == true){
-            message.reply(`SR`);
+        } else if (gachaResult < 89){
+            message.reply(`R  ${gachaResult}`);
         } else {
-            message.reply(`R ${gachaResult}`);
+            message.reply(`SR`);
         }
     };
 })
@@ -129,13 +123,13 @@ client.on(Events.MessageCreate,(message) => {
     for (let i = 1; i <= 10; i++){
         let gachaResult = getRandomInt(1, 100)
         
-        if (gachaResult == 100){
+        if (gachaResult > 98){
             gachaArr.push(` SSR`);
-        } else if ((gachaResult > 90)&&((gachaResult < 100)) == true){
-            gachaArr.push(` SR`);
-        } else {
+        } else if (gachaResult < 89){
             gachaArr.push(` R`);
             Guarantee += 1;
+        } else {
+            gachaArr.push(` SR`);
         }
     }
     if (Guarantee == 10){
@@ -144,29 +138,30 @@ client.on(Events.MessageCreate,(message) => {
     message.reply(`${gachaArr} `);
 }})
 
-var hp = 1;
-client.on(Events.MessageCreate,(message) => {
-    if (message.author.bot) return;
-    function calcHp (){
-        if (hp <= 0){
-            message.channel.send(`昇天`);
-            hp = 1;
-        } else {
-            message.channel.send(`${hp}`);
-        }
-    }
-    const reATK = /[+-]\d+/g.test(message);
-    if (reATK !== true) return;
-    const atk = parseInt(message);
-    hp = hp + atk;
-    calcHp();
-})
+// var hp = 1;
+// client.on(Events.MessageCreate,(message) => {
+//     if (message.author.bot) return;
+//     function calcHp (){
+//         if (hp <= 0){
+//             message.channel.send(`昇天`);
+//             hp = 1;
+//         } else {
+//             message.channel.send(`${hp}`);
+//         }
+//     }
+//     const reATK = /[+-]\d+/g.test(message);
+//     if (reATK !== true) return;
+//     const atk = parseInt(message);
+//     hp = hp + atk;
+//     calcHp();
+// })
 
 /* ------------------------------------------------------------------------- */
 // 用來記錄哪些用戶已經輸入了 'a'
+/*
 const userHasSentA = new Set();
 
-client.on('messageCreate', message => {
+client.on(Events.MessageCreate, message => {
     if (message.author.bot) return;
 
     // 當用戶輸入 'a' 時
@@ -185,7 +180,138 @@ client.on('messageCreate', message => {
         }
     }
 });
-
+*/
 /* ------------------------------------------------------------------------- */
+
+// godfield simple
+
+let godFieldActive = false;
+const godfieldUsers = new Set();
+
+// 教典
+const itemList = require('./godField.json')
+const catagories = ["weapons", "armor", "sundries"]
+
+// 回合 用戶HP 克里HP
+const GF = 1;
+let userHp = 10;
+let CLiHp = 10;
+
+let userTurn = true;
+
+// 手牌
+let userItemsDescription = []
+let userItemsEffect = []
+let CLiItemsEffect = []
+
+// 計算傷害
+let damage = 0;
+
+// 顯示血量
+function showHp(message){
+    message.channel.send(`> G.F. ${GF}/100\n> HP${userHp}    ${message.author.username}\n> HP${CLiHp}    CLi`);
+}
+
+// 神界開局
+client.on(Events.MessageCreate,(message) => {
+    if (message.author.bot) return;
+    if (message.content !== "神界") return;
+    // 防止重新開局
+    // if (godFieldActive == true) return;
+
+    if (message.author.username.indexOf(godfieldUsers) < 0){
+        godfieldUsers.add(message.author.username);
+    }
+    godFieldActive = true;
+    // message.channel.send(`${message.author.username} 誕生`);
+    // message.channel.send(`預言者們的戰鬥現在開始`);
+    // message.channel.send(`> G.F. ${GF}/100\n> HP${userHp}    ${message.author.username}\n> HP${CLiHp}    CLi`);
+
+    // 發牌配重
+    let deal = [getRandomInt(0,5)]
+    deal.push(getRandomInt(0, (5 - deal[0])))
+    deal.push(5 - deal[0] - deal[1])
+    // console.log(deal);
+
+    // 發牌
+    let idx = 0
+    userItemsDescription = []
+    userItemsDescription.push(`\`祈禱\``)
+    for (i = 0; i <3; i++){
+        for (a = 0; a < deal[i]; a++){
+            let p = getRandomInt(0,4)
+            userItemsDescription.push(`  \`${itemList[catagories[idx]][p]["name"]}(${itemList[catagories[idx]][p]["description"]})\``)
+            userItemsEffect.push(itemList[catagories[idx]][p]["effect"])
+        }
+        idx += 1;
+    }
+    message.channel.send(`${userItemsDescription}`);
+    message.channel.send(`${message.author.username}的回合 >`);
+})
+
+function godField (message) {
+    const rePlay = /\d\b/.test(message);
+    if (rePlay != true) return;
+
+    // 祈禱
+    if (message.content == "0"){
+        let idx = getRandomInt(0,2)
+        let p = getRandomInt(0,4)
+        userItemsDescription.push(`  \`${itemList[catagories[idx]][p]["name"]}(${itemList[catagories[idx]][p]["description"]})\``)
+        userItemsEffect.push(itemList[catagories[idx]][p]["effect"])
+        message.channel.send(`${message.author.username}祈禱 >  獲得 ${userItemsDescription[userItemsDescription.length - 1]}`);
+
+        // 手牌超過5張(不含祈禱) 正式版要改成15張
+        if (userItemsDescription.length > 5){
+            let discard = getRandomInt(1,5);
+            message.channel.send(`${message.author.username}自動丟棄 >  ${userItemsDescription[discard]}`);
+                userItemsDescription.splice(discard, 1);
+                userItemsEffect.splice(discard, 1);
+            }
+            message.channel.send(`${message.author.username}目前手牌 >  ${userItemsDescription}`);
+        } else {
+        // 出牌
+        if (message.content > (userItemsDescription.length - 1)) return;
+        let i = message.content;
+
+        console.log(i);
+        console.log(userItemsEffect.length);
+        console.log(userItemsEffect);
+        console.log(userItemsEffect[i]);
+
+        // const reHP = /hp/.test(userItemsEffect[i]);
+        const reHPe = userItemsEffect[i];
+        console.log(/hp/.test(reHPe));
+        console.log(reHPe)
+        if (reHPe == true){
+            message.channel.send(`${message.author.username}使用 >  ${userItemsDescription[i]}`);
+            console.log("給我動啊!!!!!")
+            // userHp += parseInt(userItemsEffect[i].replace("hp", ""));
+            // showHp(message);
+        } //else{
+            // let i = message.content;
+            // damage += userItemsEffect[i];
+            // message.channel.send(`${message.author.username}攻擊 >  ${userItemsDescription[i]}`);
+            // message.channel.send(`${message.author.username}攻擊 >  ${userItemsEffect[i]}`);
+        //}
+
+    }
+    // message.channel.send(`${message.author.username}的回合 > `);
+    }
+
+// 玩家出牌
+client.on(Events.MessageCreate,(message) => {
+    if (message.author.bot) return;
+    if (godFieldActive != true) return;
+    godField(message);
+})
+
+client.on(Events.MessageCreate,(message) => {
+    if (message.author.bot) return;
+    if (godFieldActive != true) return;
+    if (message.content === "手牌"){
+        message.channel.send(`${message.author.username}的手牌 >  ${userItemsDescription}`);
+    }
+})
 
 client.login(token);
