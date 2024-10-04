@@ -280,7 +280,8 @@ function godField (message) {
         console.log(userItemsEffect[i]);
 
         // const reHP = /hp/.test(userItemsEffect[i]);
-        const reHPe = userItemsEffect[i];
+        // const reHPe = userItemsEffect[i];
+        const reHPe = /hp/.test(userItemsEffect[i]);
         console.log(/hp/.test(reHPe));
         console.log(reHPe)
         if (reHPe == true){
