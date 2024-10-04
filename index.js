@@ -236,7 +236,9 @@ client.on(Events.MessageCreate,(message) => {
     // 發牌
     let idx = 0
     userItemsDescription = []
+    userItemsEffect = []
     userItemsDescription.push(`\`祈禱\``)
+    userItemsEffect.push("祈禱")
     for (i = 0; i <3; i++){
         for (a = 0; a < deal[i]; a++){
             let p = getRandomInt(0,4)
@@ -274,28 +276,17 @@ function godField (message) {
         if (message.content > (userItemsDescription.length - 1)) return;
         let i = message.content;
 
-        console.log(i);
-        console.log(userItemsEffect.length);
-        console.log(userItemsEffect);
-        console.log(userItemsEffect[i]);
-
-        // const reHP = /hp/.test(userItemsEffect[i]);
-        // const reHPe = userItemsEffect[i];
         const reHPe = /hp/.test(userItemsEffect[i]);
-        console.log(/hp/.test(reHPe));
         console.log(reHPe)
         if (reHPe == true){
             message.channel.send(`${message.author.username}使用 >  ${userItemsDescription[i]}`);
-            console.log("給我動啊!!!!!")
-            // userHp += parseInt(userItemsEffect[i].replace("hp", ""));
-            // showHp(message);
-        } //else{
-            // let i = message.content;
-            // damage += userItemsEffect[i];
-            // message.channel.send(`${message.author.username}攻擊 >  ${userItemsDescription[i]}`);
-            // message.channel.send(`${message.author.username}攻擊 >  ${userItemsEffect[i]}`);
-        //}
-
+             userHp += parseInt(userItemsEffect[i].replace("hp", ""));
+             showHp(message);
+        } else{
+             let i = message.content;
+             damage += userItemsEffect[i];
+             message.channel.send(`${message.author.username}攻擊 >  ${userItemsDescription[i]}`);
+    }
     }
     // message.channel.send(`${message.author.username}的回合 > `);
     }
