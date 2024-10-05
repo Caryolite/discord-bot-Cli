@@ -400,4 +400,14 @@ client.on(Events.MessageCreate,(message) => {
     }
 })
 
+// 中途結束神界
+client.on(Events.MessageCreate,(message) => {
+    if (message.author.bot) return;
+    if (godFieldActive != true) return;
+    if (message.content === "結束"){
+        godFieldActive = false;
+        console.log("close godField")
+    }
+})
+
 client.login(token);
