@@ -138,24 +138,6 @@ client.on(Events.MessageCreate,(message) => {
     message.reply(`${gachaArr} `);
 }})
 
-// var hp = 1;
-// client.on(Events.MessageCreate,(message) => {
-//     if (message.author.bot) return;
-//     function calcHp (){
-//         if (hp <= 0){
-//             message.channel.send(`昇天`);
-//             hp = 1;
-//         } else {
-//             message.channel.send(`${hp}`);
-//         }
-//     }
-//     const reATK = /[+-]\d+/g.test(message);
-//     if (reATK !== true) return;
-//     const atk = parseInt(message);
-//     hp = hp + atk;
-//     calcHp();
-// })
-
 /* ------------------------------------------------------------------------- */
 // 用來記錄哪些用戶已經輸入了 'a'
 /*
@@ -199,6 +181,8 @@ const catagories = ["weapons", "armor", "sundries"]
 let GF = 1;
 let userHp = 10;
 let CLiHp = 10;
+
+let userTurn = true; //true: 玩家攻擊 false: 玩家防禦
 
 // 手牌
 let userItemsDescription = []
@@ -263,9 +247,9 @@ client.on(Events.MessageCreate,(message) => {
     // 克里發牌
     dealCard(CLiItemsDescription,CLiItemsEffect);
     CLiItemsDescription.unshift("\`祈禱\`")
-    // CLiItemsDescription.push(` \`皮帽(防1)預設\``)
     CLiItemsEffect.unshift("0")
-    // CLiItemsEffect.push(-1)
+    // CLiItemsDescription.push(` \`HP1預設\``)
+    // CLiItemsEffect.push("hp1")
 
     message.channel.send(`${userItemsDescription}`);
     message.channel.send(`CLi手牌 >  ${CLiItemsDescription}`);
@@ -315,7 +299,9 @@ function CliDefend(message){
         message.channel.send(`CLi受到傷害 >  ${damage}`);
         CLiHp -= damage;
     }
+    damage = 0;
     showHp(message);
+    message.channel.send(`CLi的回合 >`);
 
     // 昇天
     if (CLiHp < 1){
@@ -325,15 +311,55 @@ function CliDefend(message){
 }
 
 // 克里攻擊
-function CLiAtteck(){
+function CLiAttack(message) {
+    const reHP = /hp/.test(CLiItemsEffect)
+    const reAtk = /[+]/.test(CLiItemsEffect)
+    damage = 0;
+    if (reHP == true){
+        // 克里+hp
+        const CLiHPfilter = CLiItemsEffect
+            .filter(item => typeof item === 'string' && item.startsWith('hp')) // 過濾出包含 'a' 的值
+            .sort((a, b) => parseInt(b.slice(1)) - parseInt(a.slice(1)))[0];  // 依照後面的數字排序並取得最大值;
+        const CLiHPIndex = CLiItemsEffect.findIndex(item => item === CLiHPfilter);
+        message.channel.send(`CLi使用 >  ${CLiItemsDescription[CLiHPIndex]}`);
+        CLiHp += parseInt(CLiItemsEffect[CLiHPIndex].replace("hp", ""));
+        spliceCard(CLiHPIndex, CLiItemsDescription, CLiItemsEffect);
+        GF += 1;
+        showHp(message);
+        message.channel.send(`${message.author.username}的回合 >`);
+    } else if (reHP == false && reAtk == true){
+        // 克里攻擊
+        const CLiAtkIndex = parseInt(findClosestIndex(5));
+        message.channel.send(`CLi攻擊 >  ${CLiItemsDescription[CLiAtkIndex]}`);
+        damage += parseInt(CLiItemsEffect[CLiAtkIndex])
+        spliceCard(CLiAtkIndex, CLiItemsDescription, CLiItemsEffect);
+        userTurn = false;
+    } else {
+        // 克里祈禱
+        let idx = getRandomInt(0,2)
+        let p = getRandomInt(0,4)
+        CLiItemsDescription.push(`  \`${itemList[catagories[idx]][p]["name"]}(${itemList[catagories[idx]][p]["description"]})\``)
+        CLiItemsEffect.push(itemList[catagories[idx]][p]["effect"])
+        message.channel.send(`CLi祈禱 >  獲得 ${CLiItemsDescription[CLiItemsDescription.length - 1]}`);
 
+        if (CLiItemsDescription.length > 16){
+            let discard = getRandomInt(1,15);
+            console.log(`丟棄 >  ${userItemsDescription[discard]}`)
+            CLiItemsDescription.splice(discard, 1);
+            CLiItemsEffect.splice(discard, 1);
+        }
+        GF += 1;
+        message.channel.send(`CLi手牌 > ${CLiItemsDescription}`);
+        message.channel.send(`${message.author.username}的回合 >`);
+    }
 }
  
 // 玩家攻擊
 function playerAttact (message) {
+    // if (userTurn != true) return;
     const rePlay = /\d\b/.test(message);
     if (rePlay != true) return;
-
+    
     // 祈禱
     if (message.content == "0"){
         let idx = getRandomInt(0,2)
@@ -342,7 +368,7 @@ function playerAttact (message) {
         userItemsEffect.push(itemList[catagories[idx]][p]["effect"])
         message.channel.send(`${message.author.username}祈禱 >  獲得 ${userItemsDescription[userItemsDescription.length - 1]}`);
 
-        // 手牌超過5張(不含祈禱) 正式版要改成15張 改了
+        // 手牌超過15張(不含祈禱) 
         if (userItemsDescription.length > 16){
             let discard = getRandomInt(1,15);
             message.channel.send(`${message.author.username}自動丟棄 >  ${userItemsDescription[discard]}`);
@@ -352,6 +378,7 @@ function playerAttact (message) {
 
         message.channel.send(`${message.author.username}目前手牌 >  ${userItemsDescription}`);
         GF += 1;
+        CLiAttack(message);
         return;
     } 
 
@@ -368,6 +395,7 @@ function playerAttact (message) {
         showHp(message);
         // spliceCard(p, userItemsDescription, userItemsEffect);
         GF += 1;
+        CLiAttack(message);
     } else if (userItemsEffect[p] < 0){
         // 使用防具(不可行)
         message.channel.send(`請使用武器 / 雜貨 / 祈禱`);
@@ -378,9 +406,16 @@ function playerAttact (message) {
         // spliceCard(p, userItemsDescription, userItemsEffect);
         CliDefend(message);
         GF += 1;
+        CLiAttack(message);
     }    
-
     // 正式版要記得刪手牌 然抽新的
+}
+
+function playerDefend (message) {
+    if (userTurn == true) return;
+    const rePlay = /\d\b/.test(message);
+    if (rePlay != true) return;
+    // 玩家防禦 還沒寫qwq
 }
 
 // 玩家出牌
