@@ -230,7 +230,6 @@ function dealCard (arrDescription, arrEffect){
         idx += 1;
 }}
 
-
 // 神界開局
 client.on(Events.MessageCreate,(message) => {
     if (message.author.bot) return;
@@ -291,9 +290,18 @@ function findClosestIndex(damage) {
 }
 
 // 使用後刪掉手牌
-function spliceCard(deleteCardIndex,arrDescription,arrEffect){
+function spliceCard(deleteCardIndex, arrDescription, arrEffect){
     arrDescription.splice(deleteCardIndex,1)
     arrEffect.splice(deleteCardIndex,1)
+}
+
+// 抽新手牌
+function getNewCard(message, arrDescription, arrEffect){
+    let deal = getRandomInt(0,2);
+    let idx = getRandomInt(0,4);
+    console.log(deal,idx)
+    arrDescription.push(`  \`${itemList[catagories[deal]][idx]["name"]}(${itemList[catagories[deal]][idx]["description"]})\``)
+    arrEffect.push(itemList[catagories[deal]][idx]["effect"])
 }
 
 // 克里防禦
@@ -309,13 +317,15 @@ function CliDefend(message){
         } else { // 防禦
             damage -= CLiItemsEffect[defi];
             message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}`);
-            spliceCard(defi, CLiItemsDescription, CLiItemsEffect);
             if (damage > 0){ 
                 message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}\nCLi受到傷害 >  ${Math.abs(damage)}`);
                 userHp -= damage;
             } else {
                 message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}  [平安]`);
             }
+            spliceCard(defi, CLiItemsDescription, CLiItemsEffect);
+            getNewCard(message ,CLiItemsDescription, CLiItemsEffect);
+            message.channel.send(`CLi獲得新牌 >  ${CLiItemsDescription[CLiItemsDescription.length - 1]}`);
         }
 
     } else {
@@ -351,6 +361,8 @@ function CLiAttack(message) {
         message.channel.send(`CLi使用 >  ${CLiItemsDescription[CLiHPIndex]}`);
         CLiHp += parseInt(CLiItemsEffect[CLiHPIndex].replace("hp", ""));
         spliceCard(CLiHPIndex, CLiItemsDescription, CLiItemsEffect);
+        getNewCard(message ,CLiItemsDescription, CLiItemsEffect);
+        message.channel.send(`CLi獲得新牌 >  ${CLiItemsDescription[CLiItemsDescription.length - 1]}`);
         showHp(message);
         newRound(message,0);
     } else if (reHP == false && reAtk == true){
@@ -359,6 +371,8 @@ function CLiAttack(message) {
         message.channel.send(`CLi攻擊 >  ${CLiItemsDescription[CLiAtkIndex]}`);
         damage += parseInt(CLiItemsEffect[CLiAtkIndex])
         spliceCard(CLiAtkIndex, CLiItemsDescription, CLiItemsEffect);
+        getNewCard(message ,CLiItemsDescription, CLiItemsEffect);
+        message.channel.send(`CLi獲得新牌 >  ${CLiItemsDescription[CLiItemsDescription.length - 1]}`);
         message.channel.send(`${message.author.username}的手牌 > ${userItemsDescription}`);
         message.channel.send(`${message.author.username}防禦 >`);
         userTurn = false;
@@ -416,6 +430,8 @@ function playerAttact (message) {
         userHp += parseInt(userItemsEffect[p].replace("hp", ""));
         showHp(message);
         spliceCard(p, userItemsDescription, userItemsEffect);
+        getNewCard(message ,userItemsDescription, userItemsEffect);
+        message.channel.send(`${message.author.username}獲得新牌 >  ${userItemsDescription[userItemsDescription.length - 1]}`);
         CLiAttack(message);
     } else if (userItemsEffect[p] < 0){
         // 使用防具(不可行)
@@ -425,10 +441,11 @@ function playerAttact (message) {
         damage += parseInt(userItemsEffect[p]);
         message.channel.send(`${message.author.username}攻擊 >  ${userItemsDescription[p]}`);
         spliceCard(p, userItemsDescription, userItemsEffect);
+        getNewCard(message ,userItemsDescription, userItemsEffect);
+        message.channel.send(`${message.author.username}獲得新牌 >  ${userItemsDescription[userItemsDescription.length - 1]}`);
         CliDefend(message);
         CLiAttack(message);
     }    
-    // 正式版要記得刪手牌 然抽新的
 }
 
 // 玩家防禦
@@ -452,6 +469,9 @@ function playerDefend (message) {
             message.channel.send(`${message.author.username}防守 >  ${userItemsDescription[p]}  [平安]`);
         }
         showHp(message);
+        spliceCard(p, userItemsDescription, userItemsEffect);
+        getNewCard(message ,userItemsDescription, userItemsEffect);
+        message.channel.send(`${message.author.username}獲得新牌 >  ${userItemsDescription[userItemsDescription.length - 1]}`);
         newRound(message,0);
     } else {
         message.channel.send(`請使用防具 / 允許`)
