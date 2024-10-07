@@ -251,23 +251,24 @@ client.on(Events.MessageCreate,(message) => {
     GF = 1;
     userHp = 10;
     CLiHp = 10;
+    userTurn = true;
 
     // 玩家發牌
     dealCard(userItemsDescription,userItemsEffect);
     userItemsDescription.unshift(`\`祈禱\``)
     userItemsEffect.unshift("祈禱")
-    // userItemsDescription.push(`\`守5預設\``)
-    // userItemsEffect.push(-5)
+    // userItemsDescription.push(`\`+5預設\``)
+    // userItemsEffect.push(+5)
 
     // 克里發牌
     dealCard(CLiItemsDescription,CLiItemsEffect);
     CLiItemsDescription.unshift("\`祈禱\`")
     CLiItemsEffect.unshift("0")
-    // CLiItemsDescription.push(` \`攻5預設\``)
-    // CLiItemsEffect.push("+5")
+    // CLiItemsDescription.push(` \`-6預設\``)
+    // CLiItemsEffect.push("-6")
 
     message.channel.send(`${message.author.username} 誕生`);
-    message.channel.send(`預言者們的戰鬥現在開始`);
+    // message.channel.send(`預言者們的戰鬥現在開始`);
     message.channel.send(`## G.F. ${GF}/100 \n> HP${userHp}    ${message.author.username}\n> HP${CLiHp}    CLi`);
     message.channel.send(`${message.author.username}的手牌 >  ${userItemsDescription}`);
     message.channel.send(`CLi手牌 >  ${CLiItemsDescription}`);
@@ -299,19 +300,24 @@ function spliceCard(deleteCardIndex,arrDescription,arrEffect){
 function CliDefend(message){
     const reDef = /-/.test(CLiItemsEffect)
     if (reDef == true){
-        damage -= damage*2
+        damage = -damage; // 變負的
         let defi = parseInt(findClosestIndex(damage));
-        if (defi == 0){
-            // 不防禦
-            message.channel.send(`CLi受到傷害 >  ${damage}`);
-            CLiHp -= damage;
-        }else{
-            // 防禦
-            damage -= CLiItemsEffect[defi]
+
+        if (defi == 0){ // 不防禦
+            message.channel.send(`CLi受到傷害 >  ${Math.abs(damage)}`);
+            CLiHp += damage;
+        } else { // 防禦
+            damage -= CLiItemsEffect[defi];
             message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}`);
             spliceCard(defi, CLiItemsDescription, CLiItemsEffect);
-            CLiHp += damage;
+            if (damage > 0){ 
+                message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}\nCLi受到傷害 >  ${Math.abs(damage)}`);
+                userHp -= damage;
+            } else {
+                message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}  [平安]`);
+            }
         }
+
     } else {
         // 沒防具
         message.channel.send(`CLi受到傷害 >  ${damage}`);
@@ -409,7 +415,7 @@ function playerAttact (message) {
         message.channel.send(`${message.author.username}使用 >  ${userItemsDescription[p]}`);
         userHp += parseInt(userItemsEffect[p].replace("hp", ""));
         showHp(message);
-        // spliceCard(p, userItemsDescription, userItemsEffect);
+        spliceCard(p, userItemsDescription, userItemsEffect);
         CLiAttack(message);
     } else if (userItemsEffect[p] < 0){
         // 使用防具(不可行)
@@ -418,7 +424,7 @@ function playerAttact (message) {
         // 攻擊
         damage += parseInt(userItemsEffect[p]);
         message.channel.send(`${message.author.username}攻擊 >  ${userItemsDescription[p]}`);
-        // spliceCard(p, userItemsDescription, userItemsEffect);
+        spliceCard(p, userItemsDescription, userItemsEffect);
         CliDefend(message);
         CLiAttack(message);
     }    
@@ -437,9 +443,14 @@ function playerDefend (message) {
         showHp(message);
         newRound(message,0);
     } else if (userItemsEffect[p] < 0){
+    // 防禦
         damage += parseInt(userItemsEffect[p]);
-        message.channel.send(`${message.author.username}防守 >  ${userItemsDescription[p]}\n ${message.author.username}受到傷害 >  ${damage}`);
-        userHp -= damage;
+        if (damage > 0){ 
+            message.channel.send(`${message.author.username}防守 >  ${userItemsDescription[p]}\n${message.author.username}受到傷害 >  ${damage}`);
+            userHp -= damage;
+        } else {
+            message.channel.send(`${message.author.username}防守 >  ${userItemsDescription[p]}  [平安]`);
+        }
         showHp(message);
         newRound(message,0);
     } else {
