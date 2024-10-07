@@ -204,7 +204,7 @@ function newRound(message,turn){
         message.channel.send(`${message.author.username}的回合 > `);
         userTurn = true;
     } else {
-        message.channel.send(`CLi的手牌 > ${CLiItemsDescription}`);
+        // message.channel.send(`CLi的手牌 > ${CLiItemsDescription}`);
         message.channel.send(`CLi的回合 > `);
         userTurn = false;
     }
@@ -267,10 +267,10 @@ client.on(Events.MessageCreate,(message) => {
     // CLiItemsEffect.push("-6")
 
     message.channel.send(`${message.author.username} 誕生`);
-    // message.channel.send(`預言者們的戰鬥現在開始`);
+    message.channel.send(`預言者們的戰鬥現在開始`);
     message.channel.send(`## G.F. ${GF}/100 \n> HP${userHp}    ${message.author.username}\n> HP${CLiHp}    CLi`);
     message.channel.send(`${message.author.username}的手牌 >  ${userItemsDescription}`);
-    message.channel.send(`CLi手牌 >  ${CLiItemsDescription}`);
+    // message.channel.send(`CLi手牌 >  ${CLiItemsDescription}`);
     message.channel.send(`${message.author.username}的回合 >`);
 })
 
@@ -299,7 +299,6 @@ function spliceCard(deleteCardIndex, arrDescription, arrEffect){
 function getNewCard(message, arrDescription, arrEffect){
     let deal = getRandomInt(0,2);
     let idx = getRandomInt(0,4);
-    console.log(deal,idx)
     arrDescription.push(`  \`${itemList[catagories[deal]][idx]["name"]}(${itemList[catagories[deal]][idx]["description"]})\``)
     arrEffect.push(itemList[catagories[deal]][idx]["effect"])
 }
@@ -325,7 +324,7 @@ function CliDefend(message){
             }
             spliceCard(defi, CLiItemsDescription, CLiItemsEffect);
             getNewCard(message ,CLiItemsDescription, CLiItemsEffect);
-            message.channel.send(`CLi獲得新牌 >  ${CLiItemsDescription[CLiItemsDescription.length - 1]}`);
+            // message.channel.send(`CLi獲得新牌 >  ${CLiItemsDescription[CLiItemsDescription.length - 1]}`);
         }
 
     } else {
@@ -335,7 +334,7 @@ function CliDefend(message){
     }
     damage = 0;
     showHp(message);
-    message.channel.send(`CLi手牌 >  ${CLiItemsDescription}`);
+    // message.channel.send(`CLi手牌 >  ${CLiItemsDescription}`);
 
     // 昇天
     if (CLiHp < 1){
@@ -362,7 +361,7 @@ function CLiAttack(message) {
         CLiHp += parseInt(CLiItemsEffect[CLiHPIndex].replace("hp", ""));
         spliceCard(CLiHPIndex, CLiItemsDescription, CLiItemsEffect);
         getNewCard(message ,CLiItemsDescription, CLiItemsEffect);
-        message.channel.send(`CLi獲得新牌 >  ${CLiItemsDescription[CLiItemsDescription.length - 1]}`);
+        // message.channel.send(`CLi獲得新牌 >  ${CLiItemsDescription[CLiItemsDescription.length - 1]}`);
         showHp(message);
         newRound(message,0);
     } else if (reHP == false && reAtk == true){
@@ -372,7 +371,7 @@ function CLiAttack(message) {
         damage += parseInt(CLiItemsEffect[CLiAtkIndex])
         spliceCard(CLiAtkIndex, CLiItemsDescription, CLiItemsEffect);
         getNewCard(message ,CLiItemsDescription, CLiItemsEffect);
-        message.channel.send(`CLi獲得新牌 >  ${CLiItemsDescription[CLiItemsDescription.length - 1]}`);
+        // message.channel.send(`CLi獲得新牌 >  ${CLiItemsDescription[CLiItemsDescription.length - 1]}`);
         message.channel.send(`${message.author.username}的手牌 > ${userItemsDescription}`);
         message.channel.send(`${message.author.username}防禦 >`);
         userTurn = false;
@@ -390,7 +389,7 @@ function CLiAttack(message) {
             CLiItemsDescription.splice(discard, 1);
             CLiItemsEffect.splice(discard, 1);
         }
-        message.channel.send(`CLi手牌 > ${CLiItemsDescription}`); //
+        // message.channel.send(`CLi手牌 > ${CLiItemsDescription}`); //
         newRound(message,0);
     }
 }
