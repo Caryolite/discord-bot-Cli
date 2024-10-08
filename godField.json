@@ -1,21 +1,6 @@
 {
     "weapons":[
         {
-            "name": "巧克力棒",
-            "effect": "+1",
-            "description": "攻1"
-        },
-        {
-            "name": "鞭子",
-            "effect": "+2",
-            "description": "攻2"
-        },
-        {
-            "name": "拳擊",
-            "effect": "+3",
-            "description": "攻3"
-        },
-        {
             "name": "斧頭",
             "effect": "+4",
             "description": "攻4"
@@ -24,14 +9,34 @@
             "name": "鎖鏈鐮刀",
             "effect": "+5",
             "description": "攻5"
+        },
+        {
+            "name": "薙刀",
+            "effect": "+7",
+            "description": "攻7"
+        },
+        {
+            "name": "力量槍斧",
+            "effect": "+9",
+            "description": "攻9"
+        },
+        {
+            "name": "驚奇之劍",
+            "effect": "+10",
+            "description": "攻10"
+        },
+        {
+            "name": "直擊粉碎斧",
+            "effect": "+12",
+            "description": "攻12"
+        },
+        {
+            "name": "惡龍爪",
+            "effect": "+15",
+            "description": "攻15"
         }
     ],
     "armor": [
-        {
-            "name": "皮帽",
-            "effect": "-1",
-            "description": "守1"
-        },
         {
             "name": "皮衣",
             "effect": "-2",
@@ -51,6 +56,11 @@
             "name": "鐵之鎧甲",
             "effect": "-5",
             "description": "守5"
+        },
+        {
+            "name": "鋼之盾",
+            "effect": "-8",
+            "description": "守8"
         }
     ],
     "sundries": [
@@ -68,16 +78,6 @@
             "name": "微笑露珠",
             "effect": "hp5",
             "description": "HP+5"
-        },
-        {
-            "name": "心之露珠",
-            "effect": "hp10",
-            "description": "HP+10"
-        },
-        {
-            "name": "浪漫水",
-            "effect": "hp15",
-            "description": "HP+15"
         }
     ]
 }

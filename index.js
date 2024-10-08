@@ -176,8 +176,8 @@ const catagories = ["weapons", "armor", "sundries"]
 
 // 回合 用戶HP 克里HP
 let GF = 1;
-let userHp = 10;
-let CLiHp = 10;
+let userHp = 20;
+let CLiHp = 20;
 
 let userTurn = true; //true: 玩家攻擊 false: 玩家防禦
 
@@ -223,7 +223,7 @@ function dealCard (arrDescription, arrEffect){
     let idx = 0
     for (i = 0; i <3; i++){
         for (a = 0; a < deal[i]; a++){
-            let p = getRandomInt(0,4)
+            let p = getRandomInt(0, (itemList[catagories[idx]].length - 1))
             arrDescription.push(`  \`${itemList[catagories[idx]][p]["name"]}(${itemList[catagories[idx]][p]["description"]})\``)
             arrEffect.push(itemList[catagories[idx]][p]["effect"])
         }
@@ -248,8 +248,8 @@ client.on(Events.MessageCreate,(message) => {
     CLiItemsDescription = [];
     CLiItemsEffect = [] ;
     GF = 1;
-    userHp = 10;
-    CLiHp = 10;
+    userHp = 20;
+    CLiHp = 20;
     userTurn = true;
 
     // 玩家發牌
@@ -298,7 +298,7 @@ function spliceCard(deleteCardIndex, arrDescription, arrEffect){
 // 抽新手牌
 function getNewCard(message, arrDescription, arrEffect){
     let deal = getRandomInt(0,2);
-    let idx = getRandomInt(0,4);
+    let idx = getRandomInt(0, itemList[catagories[deal]].length - 1);
     arrDescription.push(`  \`${itemList[catagories[deal]][idx]["name"]}(${itemList[catagories[deal]][idx]["description"]})\``)
     arrEffect.push(itemList[catagories[deal]][idx]["effect"])
 }
@@ -317,10 +317,10 @@ function CliDefend(message){
             damage -= CLiItemsEffect[defi];
             message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}`);
             if (damage > 0){ 
-                message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}\nCLi受到傷害 >  ${Math.abs(damage)}`);
-                userHp -= damage;
-            } else {
                 message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}  [平安]`);
+            } else {
+                message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}\nCLi受到傷害 >  ${Math.abs(damage)}`);
+                CLiHp += damage;
             }
             spliceCard(defi, CLiItemsDescription, CLiItemsEffect);
             getNewCard(message ,CLiItemsDescription, CLiItemsEffect);
@@ -351,6 +351,7 @@ function CLiAttack(message) {
     const reAtk = /[+]/.test(CLiItemsEffect)
     damage = 0;
 
+    // console.log(CLiItemsEffect)
     if (reHP == true){
         // 克里+hp
         const CLiHPfilter = CLiItemsEffect
@@ -366,7 +367,7 @@ function CLiAttack(message) {
         newRound(message,0);
     } else if (reHP == false && reAtk == true){
         // 克里攻擊
-        const CLiAtkIndex = parseInt(findClosestIndex(5));
+        const CLiAtkIndex = parseInt(findClosestIndex(7));
         message.channel.send(`CLi攻擊 >  ${CLiItemsDescription[CLiAtkIndex]}`);
         damage += parseInt(CLiItemsEffect[CLiAtkIndex])
         spliceCard(CLiAtkIndex, CLiItemsDescription, CLiItemsEffect);
