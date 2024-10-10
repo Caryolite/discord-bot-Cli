@@ -1,83 +1,102 @@
 {
-    "weapons":[
+    "items":[
         {
             "name": "斧頭",
             "effect": "+4",
-            "description": "攻4"
+            "description": "攻4",
+            "type": "weapons"
         },
         {
             "name": "鎖鏈鐮刀",
             "effect": "+5",
-            "description": "攻5"
+            "description": "攻5",
+            "type": "weapons"
         },
         {
             "name": "薙刀",
             "effect": "+7",
-            "description": "攻7"
+            "description": "攻7",
+            "type": "weapons"
         },
         {
             "name": "力量槍斧",
             "effect": "+9",
-            "description": "攻9"
+            "description": "攻9",
+            "type": "weapons"
         },
         {
             "name": "驚奇之劍",
             "effect": "+10",
-            "description": "攻10"
+            "description": "攻10",
+            "type": "weapons"
         },
         {
             "name": "直擊粉碎斧",
             "effect": "+12",
-            "description": "攻12"
+            "description": "攻12",
+            "type": "weapons"
         },
         {
             "name": "惡龍爪",
             "effect": "+15",
-            "description": "攻15"
-        }
-    ],
-    "armor": [
+            "description": "攻15",
+            "type": "weapons"
+        },
         {
             "name": "皮衣",
             "effect": "-2",
-            "description": "守2"
+            "description": "守2",
+            "type": "armor"
         },
         {
             "name": "鐵護手",
             "effect": "-3",
-            "description": "守3"
+            "description": "守3",
+            "type": "armor"
         },
         {
             "name": "鐵之盾",
             "effect": "-4",
-            "description": "守4"
+            "description": "守4",
+            "type": "armor"
         },
         {
             "name": "鐵之鎧甲",
             "effect": "-5",
-            "description": "守5"
+            "description": "守5",
+            "type": "armor"
         },
         {
             "name": "鋼之盾",
             "effect": "-8",
-            "description": "守8"
-        }
-    ],
-    "sundries": [
+            "description": "守8",
+            "type": "armor"
+        },
         {
             "name": "葉子上的露珠",
-            "effect": "hp3",
-            "description": "HP+3"
+            "effect": "3",
+            "description": "HP+3",
+            "type": "sundries"
         },
         {
             "name": "黎明露珠",
-            "effect": "hp4",
-            "description": "HP+4"
+            "effect": "4",
+            "description": "HP+4",
+            "type": "sundries"
         },
         {
             "name": "微笑露珠",
-            "effect": "hp5",
-            "description": "HP+5"
+            "effect": "5",
+            "description": "HP+5",
+            "type": "sundries"
         }
+    ],
+    "pray":[
+        {
+            "name": "祈禱",
+            "effect": "",
+            "description": "",
+            "type": "weapons"
+        } 
     ]
 }
