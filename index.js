@@ -230,12 +230,16 @@ client.on(Events.MessageCreate,(message) => {
     userTurn = true;
 
     // 玩家發牌
-    dealCard(userItems);
+    // dealCard(userItems);
     userItems.unshift(itemList["pray"][0])
+    userItems.push(itemList["items"][6])
 
     // 克里發牌
-    dealCard(CLiItems);
+    // dealCard(CLiItems);
     CLiItems.unshift(itemList["pray"][0])
+    CLiItems.push(itemList["items"][11])
+
+    // console.log(CLiItems.some(e => e.type == "sundries")); // 回傳 true，因為 4、5、6 大於 3
 
     message.channel.send(`${message.author.username} 誕生`);
     // message.channel.send(`預言者們的戰鬥現在開始`);
@@ -263,10 +267,10 @@ function findClosestIndex(damage) {
     // return closestIndex;
 
     let closestIndex = 0;
-    let minDiff = Math.abs(CLiItems["items"][0]["description"] - damage);
+    let minDiff = Math.abs(CLiItems[0]["effect"] - damage);
   
     for (let i = 1; i < CLiItems.length; i++) {
-      let diff = Math.abs(CLiItems["items"][i]["description"] - damage);
+      let diff = Math.abs(CLiItems[i]["effect"] - damage);
       if (diff < minDiff) {
         minDiff = diff;
         closestIndex = i;
@@ -286,39 +290,35 @@ function getNewCard(message, arr){
     arr.push(itemList["items"][p])
 }
 
-/*
 // 克里防禦
-function CliDefend(message){
-    const reDef = /-/.test(CLiItemsEffect)
-    if (reDef == true){
-        damage = -damage; // 變負的
+function CliDefend(message){    
+    if ((CLiItems.some(e => e.type == "armor")) == true){ // 有防具
         let defi = parseInt(findClosestIndex(damage));
-
+        
         if (defi == 0){ // 不防禦
             message.channel.send(`CLi受到傷害 >  ${Math.abs(damage)}`);
             CLiHp += damage;
         } else { // 防禦
-            damage -= CLiItemsEffect[defi];
-            message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}`);
-            if (damage > 0){ 
-                message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}  [平安]`);
-            } else {
-                message.channel.send(`CLi防禦 >  ${CLiItemsDescription[defi]}\nCLi受到傷害 >  ${Math.abs(damage)}`);
-                CLiHp += damage;
+            damage -= CLiItems[defi]["effect"];
+            if (damage < 0){ 
+                    message.channel.send(`CLi防禦 >  \`${CLiItems[defi]["name"]}(${CLiItems[defi]["description"]})\`\nCLi受到傷害 >  ${Math.abs(damage)}`);
+                    CLiHp += damage;
+                } else {
+                    message.channel.send(`CLi防禦 >  \`${CLiItems[defi]["name"]}(${CLiItems[defi]["description"]})\`  [平安]`);
             }
-            spliceCard(defi, CLiItemsDescription, CLiItemsEffect);
-            getNewCard(message ,CLiItemsDescription, CLiItemsEffect);
-            // message.channel.send(`CLi獲得新牌 >  ${CLiItemsDescription[CLiItemsDescription.length - 1]}`);
+            spliceCard(defi, CLiItems);
+            getNewCard(message ,CLiItems);
+            message.channel.send(`CLi獲得新牌 >  \`${CLiItems[CLiItems.length - 1]["name"]}(${CLiItems[CLiItems.length - 1]["description"]})\``);
         }
 
     } else {
         // 沒防具
-        message.channel.send(`CLi受到傷害 >  ${damage}`);
-        CLiHp -= damage;
+        message.channel.send(`CLi受到傷害 >  ${Math.abs(damage)}`);
+        CLiHp += damage;
     }
     damage = 0;
     showHp(message);
-    // message.channel.send(`CLi手牌 >  ${CLiItemsDescription}`);
+    message.channel.send(`CLi手牌 >  ${showItems(CLiItems)}`);
 
     // 昇天
     if (CLiHp < 1){
@@ -326,7 +326,7 @@ function CliDefend(message){
         godFieldActive = false;
     }
 }
-
+/*
 // 克里攻擊
 function CLiAttack(message) {
     if (godFieldActive == false) return;
@@ -385,19 +385,16 @@ function playerAttact (message) {
     if (message.content == "0"){
         getNewCard(message, userItems);
         message.channel.send(`${message.author.username}祈禱 >  獲得\`${userItems[userItems.length -1]["name"]}(${userItems[userItems.length -1]["description"]})\``);
-
         // 手牌超過15張(不含祈禱) 
         if (userItems.length > 16){
             let discard = getRandomInt(1,15);
             message.channel.send(`${message.author.username}自動丟棄 >  \`${userItems[discard]["name"]}(${userItems[discard]["description"]})\``);
                 userItems.splice(discard, 1);
             }
-
         message.channel.send(`${message.author.username}目前手牌 >  ${showItems(userItems)}`);
         // CLiAttack(message);
         return;
     } 
-
     // 出牌
     if (message.content > (userItems.length - 1)) return;
     const p = message.content;
@@ -408,8 +405,8 @@ function playerAttact (message) {
         message.channel.send(`${message.author.username}使用 >  \`${userItems[p]["name"]}${userItems[p]["description"]})\``);
         userHp += parseInt(userItems[p]["effect"]);
         showHp(message);
-        spliceCard(p, userItems);
-        getNewCard(message ,userItems);
+        // spliceCard(p, userItems);
+        // getNewCard(message ,userItems);
         message.channel.send(`${message.author.username}獲得新牌 >  \`${userItems[userItems.length -1]["name"]}(${userItems[userItems.length -1]["description"]})\``);
         // CLiAttack(message);
         
@@ -419,12 +416,13 @@ function playerAttact (message) {
         
         }else if (userItems[p].type == "weapons"){
         // 攻擊
-        damage += parseInt(userItems[p]["effect"]);
+        damage -= parseInt(userItems[p]["effect"]);
         message.channel.send(`${message.author.username}攻擊 >  \`${userItems[p]["name"]}(${userItems[p]["description"]})\``);
-        spliceCard(p, userItems);
-        getNewCard(message ,userItems);
+        // spliceCard(p, userItems);
+        // getNewCard(message ,userItems);
         message.channel.send(`${message.author.username}獲得新牌 >  \`${userItems[userItems.length -1]["name"]}(${userItems[userItems.length -1]["description"]})\``);
-        // CliDefend(message);
+        // console.log(`玩家造成${damage}點傷害`) //
+        CliDefend(message);
         // CLiAttack(message);
     }    
 }
