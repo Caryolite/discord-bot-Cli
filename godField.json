@@ -19,6 +19,12 @@
             "type": "weapons"
         },
         {
+            "name": "最後的長毛",
+            "effect": "+8",
+            "description": "攻8",
+            "type": "weapons"
+        },
+        {
             "name": "力量槍斧",
             "effect": "+9",
             "description": "攻9",
@@ -34,6 +40,12 @@
             "name": "直擊粉碎斧",
             "effect": "+12",
             "description": "攻12",
+            "type": "weapons"
+        },
+        {
+            "name": "絕景之矛",
+            "effect": "+13",
+            "description": "攻13",
             "type": "weapons"
         },
         {
@@ -73,6 +85,12 @@
             "type": "armor"
         },
         {
+            "name": "能量頭盔",
+            "effect": "-10",
+            "description": "守10",
+            "type": "armor"
+        },
+        {
             "name": "葉子上的露珠",
             "effect": "3",
             "description": "HP+3",
@@ -94,9 +112,9 @@
     "pray":[
         {
             "name": "祈禱",
-            "effect": "",
+            "effect": "0",
             "description": "",
-            "type": "weapons"
+            "type": "pray"
         } 
     ]
 }
