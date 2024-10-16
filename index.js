@@ -132,6 +132,7 @@ client.on(Events.MessageCreate,(message) => {
 
 let godFieldActive = false;
 const godfieldUsers = new Set();
+let godFieldChannel = "";
 
 // 教典
 const itemList = require('./godField.json')
@@ -211,6 +212,9 @@ client.on(Events.MessageCreate,(message) => {
     userHp = 20;
     CLiHp = 20;
     userTurn = true;
+
+    godFieldChannel = message.channel.id
+    // console.log(`channel id = ${godFieldChannel}`)
 
     // 玩家發牌
     userItems.unshift(itemList["pray"][0])
@@ -433,36 +437,35 @@ function playerDefend (message) {
 // 玩家出牌
 client.on(Events.MessageCreate,(message) => {
     if (message.author.bot) return;
-    if (godFieldActive != true) return;
-    
-    const rePlay = /\d\b/.test(message);
-    if (rePlay != true) return;
-    if (userTurn == true){
-        // 玩家攻擊
-        playerAttact(message);
-    } else {
-        // 玩家防禦
-        playerDefend(message);
-    }
-})
+    if (message.channel.id != godFieldChannel) return;
+    if (godFieldActive == true) {
 
-    // 顯示手牌
-client.on(Events.MessageCreate,(message) => {
-    if (message.author.bot) return;
-    if (godFieldActive != true) return;
+        // 顯示手牌
+        if (message.content === "手牌"){
+            message.channel.send(`${message.author.username}的手牌 >  ${showItems(userItems)}`);
+        }
 
-    if (message.content === "手牌"){
-        message.channel.send(`${message.author.username}的手牌 >  ${showItems(userItems)}`);
-    }
-})
+        // 玩家的回合
+        const rePlay = /\d\b/.test(message);
+        if (rePlay != true) return;
+        if (userTurn == true){
+            // 玩家攻擊
+            playerAttact(message);
+        } else {
+            // 玩家防禦
+            playerDefend(message);
+        }   
+    }})
 
     // 中途結束神界
 client.on(Events.MessageCreate,(message) => {
     if (message.author.bot) return;
+    if (message.channel.id != godFieldChannel) return;
     if (message.content === "結束"){
         godFieldActive = false;
         console.log("close godField");
     }
+    
 })
 
 client.login(token);
