@@ -5,7 +5,7 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 # 複製本地的 Discord bot 代碼到容器內部
-COPY E:/discord-bot /usr/src/app
+COPY . .
 
 # 安裝應用程式的依賴
 RUN npm install

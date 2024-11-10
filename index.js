@@ -131,8 +131,9 @@ client.on(Events.MessageCreate,(message) => {
 // godfield simple
 
 let godFieldActive = false;
-const godfieldUsers = new Set();
-let godFieldChannel = "";
+// const godfieldUsers = new Set();
+var godFieldPlayer = ""; //玩家名稱
+let godFieldChannel = ""; //頻道
 
 // 教典
 const itemList = require('./godField.json')
@@ -162,8 +163,8 @@ function newRound(message,turn){
     GF += 1;
     showGF(message);
     if (turn == 0){
-        message.channel.send(`${message.author.username}的手牌 > ${showItems(userItems)}`);
-        message.channel.send(`${message.author.username}的回合 > `);
+        message.channel.send(`${godFieldPlayer}的手牌 > ${showItems(userItems)}`);
+        message.channel.send(`${godFieldPlayer}的回合 > `);
         userTurn = true;
     } else {
         // message.channel.send(`CLi的手牌 > ${showItems(CLiItems)}`);
@@ -174,7 +175,7 @@ function newRound(message,turn){
 
 // 顯示血量
 function showHp(message){
-    message.channel.send(`> HP ${userHp}    ${message.author.username}\n> HP ${CLiHp}    CLi`);
+    message.channel.send(`> HP ${userHp}    ${godFieldPlayer}\n> HP ${CLiHp}    CLi`);
 }
 
 // 發牌
@@ -200,10 +201,13 @@ client.on(Events.MessageCreate,(message) => {
     if (message.content !== "神界") return;
     if (godFieldActive == true) return;    // 防止重新開局
 
-    if (message.author.username.indexOf(godfieldUsers) < 0){
-        godfieldUsers.add(message.author.username);
-    }
+    // if (message.author.username.indexOf(godfieldUsers) < 0){
+    //     godfieldUsers.add(message.author.username);
+    // }
     godFieldActive = true;
+
+    godFieldPlayer = message.author.username
+    // console.log(godFieldPlayer)
 
     // reset Game
     userItems = []
@@ -226,15 +230,15 @@ client.on(Events.MessageCreate,(message) => {
     dealCard(CLiItems);
     // CLiItems.push(itemList["items"][0])
 
-    message.channel.send(`${message.author.username} 誕生`);
+    message.channel.send(`${godFieldPlayer} 誕生`);
     message.channel.send(`預言者們的戰鬥現在開始`);
-    message.channel.send(`## G.F. ${GF}/100 \n> HP${userHp}    ${message.author.username}\n> HP${CLiHp}    CLi`);
-    message.channel.send(`${message.author.username}的手牌 >  ${showItems(userItems)}`);
+    message.channel.send(`## G.F. ${GF}/100 \n> HP${userHp}    ${godFieldPlayer}\n> HP${CLiHp}    CLi`);
+    message.channel.send(`${godFieldPlayer}的手牌 >  ${showItems(userItems)}`);
     // message.channel.send(`CLi手牌 >  ${showItems(CLiItems)}`);
 
     // console.log(userItems,CLiItems)
     
-    message.channel.send(`${message.author.username}的回合 >`);
+    message.channel.send(`${godFieldPlayer}的回合 >`);
 })
 
 // 找最接近
@@ -296,9 +300,15 @@ function CliDefend(message){
 
     // 昇天
     if (CLiHp < 1){
-        message.channel.send(`CLi昇天 > 遊戲結束\n### 贏家 ${message.author.username}`);
-        godFieldActive = false;
+        message.channel.send(`CLi昇天 > 遊戲結束\n### 贏家 ${godFieldPlayer}`);
+        closeGodField ();
     }
+}
+
+// 神界結束
+function closeGodField (){
+    godFieldPlayer = "";
+    godFieldActive = false;
 }
 
 // 克里攻擊
@@ -326,8 +336,8 @@ function CLiAttack(message) {
         spliceCard(CLiItems.indexOf(CLiAtkIndex), CLiItems);
         getNewCard(message, CLiItems);
         // message.channel.send(`CLi獲得新牌 >  \`${CLiItems[CLiItems.length - 1]["name"]}(${CLiItems[CLiItems.length - 1]["description"]})\``);
-        message.channel.send(`${message.author.username}的手牌 >  ${showItems(userItems)}`);
-        message.channel.send(`${message.author.username}防禦 >`);
+        message.channel.send(`${godFieldPlayer}的手牌 >  ${showItems(userItems)}`);
+        message.channel.send(`${godFieldPlayer}防禦 >`);
         userTurn = false;
     } else {
         // 克里祈禱
@@ -349,14 +359,14 @@ function playerAttact (message) {
     // 祈禱
     if (message.content == "0"){
         getNewCard(message, userItems);
-        message.channel.send(`${message.author.username}祈禱 >  獲得\`${userItems[userItems.length -1]["name"]}(${userItems[userItems.length -1]["description"]})\``);
+        message.channel.send(`${godFieldPlayer}祈禱 >  獲得\`${userItems[userItems.length -1]["name"]}(${userItems[userItems.length -1]["description"]})\``);
         // 手牌超過15張(不含祈禱) 
         if (userItems.length > 16){
             let discard = getRandomInt(1,15);
-            message.channel.send(`${message.author.username}自動丟棄 >  \`${userItems[discard]["name"]}(${userItems[discard]["description"]})\``);
+            message.channel.send(`${godFieldPlayer}自動丟棄 >  \`${userItems[discard]["name"]}(${userItems[discard]["description"]})\``);
             userItems.splice(discard, 1);
         }
-        message.channel.send(`${message.author.username}目前手牌 >  ${showItems(userItems)}`);
+        message.channel.send(`${godFieldPlayer}目前手牌 >  ${showItems(userItems)}`);
         CLiAttack(message);
         return;
     } 
@@ -367,12 +377,12 @@ function playerAttact (message) {
 
     if (userItems[p].type == "sundries") {
         // 使用雜貨
-        message.channel.send(`${message.author.username}使用 >  \`${userItems[p]["name"]}(${userItems[p]["description"]})\``);
+        message.channel.send(`${godFieldPlayer}使用 >  \`${userItems[p]["name"]}(${userItems[p]["description"]})\``);
         userHp += parseInt(userItems[p]["effect"]);
         showHp(message);
         spliceCard(p, userItems);
         getNewCard(message ,userItems);
-        message.channel.send(`${message.author.username}獲得新牌 >  \`${userItems[userItems.length -1]["name"]}(${userItems[userItems.length -1]["description"]})\``);
+        message.channel.send(`${godFieldPlayer}獲得新牌 >  \`${userItems[userItems.length -1]["name"]}(${userItems[userItems.length -1]["description"]})\``);
         CLiAttack(message);
         
     }else if (userItems[p].type == "armor"){
@@ -382,10 +392,10 @@ function playerAttact (message) {
     }else if (userItems[p].type == "weapons"){
         // 攻擊
         damage -= parseInt(userItems[p]["effect"]);
-        message.channel.send(`${message.author.username}攻擊 >  \`${userItems[p]["name"]}(${userItems[p]["description"]})\``);
+        message.channel.send(`${godFieldPlayer}攻擊 >  \`${userItems[p]["name"]}(${userItems[p]["description"]})\``);
         spliceCard(p, userItems);
         getNewCard(message ,userItems);
-        message.channel.send(`${message.author.username}獲得新牌 >  \`${userItems[userItems.length -1]["name"]}(${userItems[userItems.length -1]["description"]})\``);
+        message.channel.send(`${godFieldPlayer}獲得新牌 >  \`${userItems[userItems.length -1]["name"]}(${userItems[userItems.length -1]["description"]})\``);
         CliDefend(message);
         CLiAttack(message);
     }    
@@ -399,13 +409,13 @@ function playerDefend (message) {
     // 允許(沒防具)
     if (message.content == "0"){
         userHp -= damage;
-        message.channel.send(`${message.author.username}防禦 >  允許`);
-        message.channel.send(`${message.author.username}受到傷害 >  ${Math.abs(damage)}`);
+        message.channel.send(`${godFieldPlayer}防禦 >  允許`);
+        message.channel.send(`${godFieldPlayer}受到傷害 >  ${Math.abs(damage)}`);
         showHp(message);
         // 昇天
         if (userHp < 1){
-            message.channel.send(`${message.author.username}昇天 > 遊戲結束\n### 贏家 CLi`);
-            godFieldActive = false;
+            message.channel.send(`${godFieldPlayer}昇天 > 遊戲結束\n### 贏家 CLi`);
+            closeGodField ();
         } else {
             newRound(message,0);
         }
@@ -413,19 +423,19 @@ function playerDefend (message) {
     // 防禦
         damage += parseInt(userItems[p]["effect"]);
         if (damage > 0){ 
-            message.channel.send(`${message.author.username}防禦 >  \`${userItems[p]["name"]}(${userItems[p]["description"]})\``);
-            message.channel.send(`${message.author.username}受到傷害 >  ${damage}`);
+            message.channel.send(`${godFieldPlayer}防禦 >  \`${userItems[p]["name"]}(${userItems[p]["description"]})\``);
+            message.channel.send(`${godFieldPlayer}受到傷害 >  ${damage}`);
             userHp -= damage;
         } else {
-            message.channel.send(`${message.author.username}防禦 >  \`${userItems[p]["name"]}(${userItems[p]["description"]})\`  [平安]`);
+            message.channel.send(`${godFieldPlayer}防禦 >  \`${userItems[p]["name"]}(${userItems[p]["description"]})\`  [平安]`);
         }
         showHp(message);
         spliceCard(p, userItems);
         getNewCard(message, userItems);
-        message.channel.send(`${message.author.username}獲得新牌 >  \`${userItems[userItems.length -1]["name"]}(${userItems[userItems.length -1]["description"]})\``);
+        message.channel.send(`${godFieldPlayer}獲得新牌 >  \`${userItems[userItems.length -1]["name"]}(${userItems[userItems.length -1]["description"]})\``);
         if (userHp < 1){
-            message.channel.send(`${message.author.username}昇天 > 遊戲結束\n### 贏家 CLi`);
-            godFieldActive = false;
+            message.channel.send(`${godFieldPlayer}昇天 > 遊戲結束\n### 贏家 CLi`);
+            closeGodField ();
         } else {
             newRound(message,0);
         }
@@ -438,11 +448,16 @@ function playerDefend (message) {
 client.on(Events.MessageCreate,(message) => {
     if (message.author.bot) return;
     if (message.channel.id != godFieldChannel) return;
+
+
     if (godFieldActive == true) {
+        // console.log(godFieldPlayer)
+
+        if (message.author.username != godFieldPlayer) return; //防止別的玩家出牌
 
         // 顯示手牌
         if (message.content === "手牌"){
-            message.channel.send(`${message.author.username}的手牌 >  ${showItems(userItems)}`);
+            message.channel.send(`${godFieldPlayer}的手牌 >  ${showItems(userItems)}`);
         }
 
         // 玩家的回合
@@ -454,15 +469,16 @@ client.on(Events.MessageCreate,(message) => {
         } else {
             // 玩家防禦
             playerDefend(message);
-        }   
+        }  
+    
     }})
 
     // 中途結束神界
 client.on(Events.MessageCreate,(message) => {
     if (message.author.bot) return;
-    if (message.channel.id != godFieldChannel) return;
+    // if (message.channel.id != godFieldChannel) return;
     if (message.content === "結束"){
-        godFieldActive = false;
+        closeGodField();
         console.log("close godField");
     }
     
