@@ -1,8 +1,6 @@
-// Require the necessary discord.js classes
 const { Client, Events, GatewayIntentBits } = require('discord.js');
 const { token } = require('./config.json');
 
-// Create a new client instance
 const client = new Client({
     intents: [
       GatewayIntentBits.Guilds,
@@ -13,9 +11,6 @@ const client = new Client({
     ],
   });
 
-// When the client is ready, run this code (only once).
-// The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
-// It makes some properties non-nullable.
 client.once(Events.ClientReady, readyClient => {
 	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
 });
@@ -30,23 +25,10 @@ function getRandomInt(min, max) {
 client.on(Events.MessageCreate,(message) => {
     if (message.author.bot) return;
 
-    if (message.content === "hello") {
-        message.channel.send("嗨");
-    } else if (message.content === "戳") {
-        if (message.author.bot) return;
-        message.channel.send("嗚哇><");
+    if (message.content === "戳") {
+        message.reply("嗚哇><");
     } else if (message.content === "嗚哇><") {
         message.channel.send("？我沒戳你");
-    }
-
-    // 克里在嗎
-    if (message.content === "克里在嗎") {
-        let p = getRandomInt(1,2);
-        if (p == 1){
-            message.channel.send(`不在`);
-        } else {
-            message.channel.send(`我在喔:3`);
-        }
     }
 
     // 隨機
@@ -72,8 +54,14 @@ client.on(Events.MessageCreate,(message) => {
     const reFactor = /因數/.test(message);
     if (reFactor == true) {
         let num = message.content.split(" ");
-        if ((num[0]) !== "因數") return;
 
+        if ((num[0]) !== "因數") return;
+        
+        if (num[1] == undefined){
+            message.channel.send(`你沒放數字`);
+            return;
+        } 
+            
         let fac = num[1];
         let factor = [];
 
