@@ -46,5 +46,7 @@ ex. 因數 24
 神界 - 終末之時  
 神界 - 感冒玩家狀態  
 
-人設來源: 和月(Caryolite)也就是我  
+人設來源: 和月(也就是我)  
+![img](./img.jpg)  
+繪圖也是我  
 [我的discord伺服器](https://discord.gg/SVYdu2mU3k)  
